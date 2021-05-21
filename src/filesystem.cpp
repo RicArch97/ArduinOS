@@ -63,13 +63,13 @@ int checkFATSpace(int size) {
 
     // sort multiple files based on start address
     if (no_of_files > 1) {
-        int temp = 0;
+        File temp;
         for (int index = 0; index < no_of_files; index++) {
             for (int next = index + 1; next < no_of_files; index++) {
                 if (ee_files[index].addr > ee_files[next].addr) {
-                    temp = ee_files[index].addr;
-                    ee_files[index].addr= ee_files[next].addr;
-                    ee_files[next].addr = temp;
+                    temp = ee_files[index];
+                    ee_files[index] = ee_files[next];
+                    ee_files[next] = temp;
                 }
             }
         }
