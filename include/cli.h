@@ -2,7 +2,7 @@
     Header for the CLI of ArduinOS.
 
     Created by Ricardo Steijn on 12-05-2021.
-    Last update on 17-05-2021.
+    Last update on 19-05-2021.
 */
 
 #ifndef CLI_H
@@ -33,26 +33,8 @@
 #define SPACE_CHAR          ' '
 #define SPACE_STR           " "
 
-// Stub
-#define STUB                "\n"                                                                    \
-                            "ArduinOS 0.1, A Unix like operating system for Arduino.\n"             \
-                            "Usage: command [options]\n"                                            \
-                            "\n"                                                                    \
-                            "Commands:\n"                                                           \
-                            "store\t\t<file> <size> <data>\tStore a file in the filesystem.\n"      \
-                            "retrieve\t<file>\t\t\tRequest a file from the filesystem.\n"           \
-                            "erase\t\t<file>\t\t\tErase a file.\n"                                  \
-                            "files\t\t\t\t\tList all files in the filesystem.\n"                    \
-                            "freespace\t\t\t\tShow the amount of free space in the filesystem.\n"   \
-                            "run\t\t<file>\t\t\tRun a program.\n"                                   \
-                            "list\t\t\t\t\tShow a list with all processes.\n"                       \
-                            "suspend\t\t<id>\t\t\tSuspend a process.\n"                             \
-                            "resume\t\t<id>\t\t\tResume a process.\n"                               \
-                            "kill\t\t<id>\t\t\tKill a process."                                     \
-                            "\n"
-
 // Function definitions
 void argumentParser();
-void help(CommandArgs args);
+void help(CommandArgs *args);
 
 #endif

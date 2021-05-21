@@ -8,18 +8,22 @@
 #include <Arduino.h>
 #include "common.h"
 
-void suspend(CommandArgs args) {
+void run(CommandArgs *argv) {
+    Serial.println("run called");
+}
+
+void list(CommandArgs *argv) {
+    Serial.println("list called");
+}
+
+void suspend(CommandArgs *argv) {
     Serial.println("suspend called");
 }
 
-void resume(CommandArgs args) {
+void resume(CommandArgs *argv) {
     Serial.println("resume called");
 }
 
-void kill(CommandArgs args) {
+void kill(CommandArgs *argv) {
     Serial.println("kill called");
-}
-
-void id() {
-    Serial.println("id argument used");
 }

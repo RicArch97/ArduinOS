@@ -11,8 +11,8 @@
 void setup() {
   Serial.begin(9600);
 
-  Serial.println("Welcome to ArduinOS on tty1.");
-  Serial.println("Type \"help\" to see a list of commands.");
+  Serial.println(F("Welcome to ArduinOS on tty1."));
+  Serial.println(F("Type \"help\" to see a list of commands."));
 }
 
 void loop() {

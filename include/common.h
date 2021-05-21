@@ -7,11 +7,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define ARG_NAMESIZE        64
-#define MAX_ARG_COUNT       3
+#define ARG_NAMESIZE    64
+#define MAX_ARG_AMOUNT  3
 
 typedef struct {
-    char args[MAX_ARG_COUNT][ARG_NAMESIZE];
+    char arg[MAX_ARG_AMOUNT][ARG_NAMESIZE];
 } CommandArgs;
 
 #endif
