@@ -102,15 +102,21 @@ void store(CommandArgs *argv) {
         }
     }
     // Create file using name and size.
-    int size = atoi(argv->arg[2]);
-    File file = {0};
-    strcpy(file.name, argv->arg[0]);
+    int size = atoi(argv->arg[1]);
+    char *name = strdup(argv->arg[0]);
+    //File file = {0};
+    //strcpy(file.name, argv->arg[0]);
     // Data
     char *data = strdup(argv->arg[2]);
+
+    Serial.println(name);
+    Serial.println(size);
+    Serial.println(data);
 
     // check if filename exists
 
     // free allocated memory by strdup
+    free(name);
     free(data);
 }
 
