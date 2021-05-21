@@ -82,8 +82,8 @@ int checkFATSpace(int size) {
     }
     
     // space till end of FAT
-    if (((ee_files[0].addr + ee_files[0].size) - (int)EEPROM.length()) > size) {
-        return ee_files[0].addr + ee_files[0].size;
+    if (((ee_files[no_of_files - 1].addr + ee_files[no_of_files - 1].size) - (int)EEPROM.length()) > size) {
+        return ee_files[no_of_files - 1].addr + ee_files[no_of_files - 1].size;
     }
     else {
         Serial.println(F("Not enough space left in the filesystem."));
