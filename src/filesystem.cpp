@@ -12,11 +12,6 @@
 
 EERef no_of_files = EEPROM[NOF_PTR] = 0;
 
-void writeFATEntry(File file) {
-    // write a file to the EEPROM.
-    EEPROM.put(FST_PTR + (no_of_files * sizeof(File)), file);
-}
-
 int findFATEntry(const char *name) {
     // find an entry on the EEPROM by name.
     if (no_of_files == 0) return -1;
@@ -30,6 +25,16 @@ int findFATEntry(const char *name) {
         eof_address += sizeof(File);
     }
     return -1;
+}
+
+void writeFATEntry(File file) {
+    // write a file to the EEPROM.
+    no_of_files++;
+    EEPROM.put(FST_PTR + (no_of_files * sizeof(File)), file);
+}
+
+void writeData(int addr, char *data) {
+    // write data to the referenced address in the FAT.
 }
 
 int sortFAT() {
@@ -69,7 +74,7 @@ int checkFATSpace(int size) {
             Serial.println(EEPROM.length() - sizeof(File));
             return -1;
         }
-        else return FST_PTR;
+        else return FST_PTR + sizeof(File);
     }
 
     // sort FAT based on begin address, get end of FAT pointer
@@ -112,16 +117,38 @@ void store(CommandArgs *argv) {
             return;
         }
     }
-    // Create file using name and size.
-    int size = atoi(argv->arg[2]);
-    File file = {0};
-    strcpy(file.name, argv->arg[0]);
-    // Data
-    char *data = strdup(argv->arg[2]);
+    // check that the size is a number
+    int size = atoi(argv->arg[1]);
+    if (size <= 0) {
+        Serial.println(F("The \"size\" argument should be a number."));
+        return;
+    }
 
+    char *name = strdup(argv->arg[0]);
     // check if filename exists
+    if (findFATEntry(name) > 0) {
+        Serial.print(F("File with name: "));
+        Serial.print(name);
+        Serial.println(F("already exists in the filesystem."));
 
-    // free allocated memory by strdup
+        free(name);
+        return;
+    }
+
+    // check for free space in the FAT & drive
+    int blk_ptr = checkFATSpace(size);
+    if (blk_ptr < FST_PTR) {
+        free(name);
+        return;
+    }
+
+    // create a file in the filesystem
+    File file = {*name, blk_ptr, size};
+    writeFATEntry(file);
+
+    // write the file data to the drive
+    char *data = strdup(argv->arg[2]);
+    writeData(blk_ptr, data);
     free(data);
 }
 

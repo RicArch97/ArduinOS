@@ -21,10 +21,11 @@ typedef struct {
     int size;
 } File;
 
-void writeFATEntry(File file);
 int findFATEntry();
-bool checkFATSpace();
+void writeFATEntry(File file);
+void writeData(int addr, char *data);
 int sortFAT();
+int checkFATSpace();
 
 void store(CommandArgs *argv);
 void retrieve(CommandArgs *argv);
