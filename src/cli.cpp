@@ -13,12 +13,11 @@
 
 typedef struct {
     char name[COMMAND_NAMESIZE];
-    void (*func)(CommandArgs*);
+    void (*func)(CommandArgs);
 } CommandType;
 
 static char buffer[BUFSIZE];
 static int char_count = 0;
-static CommandArgs argv;
 
 static const CommandType command[] = {
     {HELP, &help},
@@ -44,6 +43,7 @@ void argumentParser() {
             if (char_count > 0) {
                 bool command_found = false;
                 bool error_flag = false;
+                CommandArgs argv = {0};
 
                 for (unsigned int n = 0; n < (sizeof(command) / sizeof(CommandType)); n++) {
                     if (memchr(buffer, SPACE_CHAR, sizeof(buffer)) != NULL) {
@@ -87,7 +87,7 @@ void argumentParser() {
                         }
                     }
                     if (!error_flag && command_found) {
-                        command[n].func(&argv);
+                        command[n].func(argv);
                         break;
                     }
                 }
@@ -102,6 +102,12 @@ void argumentParser() {
                 char_count = 0;
                 // reset arg struct
                 memset(&argv, 0, sizeof(CommandArgs));
+            }
+        }
+        else if (c == BACKSPACE) {
+            if (char_count > 0) {
+                char_count--;
+                memset(&buffer[char_count], 0x00, sizeof(char));
             }
         }
         else {
@@ -119,7 +125,7 @@ void argumentParser() {
     }
 }
 
-void help(CommandArgs *argv) {
+void help(CommandArgs argv) {
     Serial.println(F(
         "\n"
         "ArduinOS 0.1, A Unix like operating system for Arduino.\n"

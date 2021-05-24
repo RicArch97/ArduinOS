@@ -12,8 +12,8 @@
 
 #define AMOUNT_OF_FILES 10
 #define FILENAME_SIZE   12
-#define NOF_PTR         0x00
-#define FST_PTR         0x01
+#define NOF_PTR         0
+#define FST_PTR         1
 
 typedef struct {
     char name[FILENAME_SIZE];
@@ -21,16 +21,17 @@ typedef struct {
     int size;
 } File;
 
+int getNoOfFiles();
 int findFATEntry();
 void writeFATEntry(File file);
-void writeData(int addr, char *data);
-int sortFAT();
+void writeData(int addr, int size, char *data);
+void sortFAT();
 int checkFATSpace();
 
-void store(CommandArgs *argv);
-void retrieve(CommandArgs *argv);
-void erase(CommandArgs *argv);
-void files(CommandArgs *argv);
-void freespace(CommandArgs *argv);
+void store(CommandArgs argv);
+void retrieve(CommandArgs argv);
+void erase(CommandArgs argv);
+void files(CommandArgs argv);
+void freespace(CommandArgs argv);
 
 #endif

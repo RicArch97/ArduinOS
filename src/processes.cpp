@@ -8,22 +8,22 @@
 #include <Arduino.h>
 #include "common.h"
 
-void run(CommandArgs *argv) {
+void run(CommandArgs argv) {
     Serial.println("run called");
 }
 
-void list(CommandArgs *argv) {
+void list(CommandArgs argv) {
     Serial.println("list called");
 }
 
-void suspend(CommandArgs *argv) {
+void suspend(CommandArgs argv) {
     Serial.println("suspend called");
 }
 
-void resume(CommandArgs *argv) {
+void resume(CommandArgs argv) {
     Serial.println("resume called");
 }
 
-void kill(CommandArgs *argv) {
+void kill(CommandArgs argv) {
     Serial.println("kill called");
 }

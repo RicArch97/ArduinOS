@@ -8,10 +8,10 @@
 #ifndef PROCESSES_H
 #define PROCESSES_H
 
-void run(CommandArgs *argv);
-void list(CommandArgs *argv);
-void suspend(CommandArgs *argv);
-void resume(CommandArgs *argv);
-void kill(CommandArgs *argv);
+void run(CommandArgs argv);
+void list(CommandArgs argv);
+void suspend(CommandArgs argv);
+void resume(CommandArgs argv);
+void kill(CommandArgs argv);
 
 #endif

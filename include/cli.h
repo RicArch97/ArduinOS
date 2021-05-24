@@ -30,11 +30,12 @@
 // Tokens
 #define CR                  '\r'
 #define LF                  '\n'
+#define BACKSPACE           '\x08'
 #define SPACE_CHAR          ' '
 #define SPACE_STR           " "
-
+         
 // Function definitions
 void argumentParser();
-void help(CommandArgs *args);
+void help(CommandArgs args);
 
 #endif
