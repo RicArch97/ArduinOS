@@ -10,7 +10,7 @@
 #include "common.h"
 #include "filesystem.h"
 
-EERef no_of_files = getNoOfFiles();
+EERef no_of_files = getNoOfFiles();  //TODO: value not correct after reboot Arduino
 
 int getNoOfFiles() {
     // initiate to zero or get current value.
@@ -24,7 +24,9 @@ int findFATEntry(const char *name) {
     // find an entry on the EEPROM by name.
     if (no_of_files == 0) return -1;
 
-    for (unsigned int e = FST_PTR; e < (FST_PTR + (no_of_files * sizeof(File))); e += sizeof(File)) {
+    int eof_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    // compare the name of every file struct to the arg
+    for (int e = FST_PTR; e < eof_ptr; e += sizeof(File)) {
         File file = (File)EEPROM.get(e, file);
         if (strcmp(file.name, name) == 0) {
             return e;
@@ -35,7 +37,7 @@ int findFATEntry(const char *name) {
 
 void writeFATEntry(File file) {
     // write a file to the EEPROM.
-    EEPROM.put(FST_PTR + (no_of_files * sizeof(File)), file);
+    EEPROM.put(FST_PTR + ((int)no_of_files * sizeof(File)), file);
     no_of_files++;
 }
 
@@ -43,24 +45,23 @@ void writeData(int addr, int size, char *data) {
     // write data to the referenced address in the FAT.
     int str_index = 0;
     for (int b = addr; b < (addr + size); b++) {
-        if (data[str_index] != '\0') {
-            EEPROM.write(b, data[str_index]);
-        }
+        if (str_index >= (int)strlen(data)) break;
+        EEPROM.write(b, data[str_index]);
         str_index++;
     }
 }
 
 void sortFAT() {
     // loop through all structs on the EEPROM
-    File temp = {0};
-    for (unsigned int c = FST_PTR; c < (FST_PTR + (no_of_files * sizeof(File))); c += sizeof(File)) {
-        for (unsigned int n = c + sizeof(File); n < (FST_PTR + (no_of_files * sizeof(File))); n += sizeof(File)) {
-            // compare current file with next file
+    int eof_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    // compare current file with next file
+    for (int c = FST_PTR; c < eof_ptr; c += sizeof(File)) {
+        for (int n = c + sizeof(File); n < eof_ptr; n += sizeof(File)) {
             File c_file = (File)EEPROM.get(c, c_file);
             File n_file = (File)EEPROM.get(n, n_file);
 
             if (c_file.addr > n_file.addr) {
-                temp = c_file;
+                File temp = c_file;
                 EEPROM.put(c, n_file);
                 EEPROM.put(n, temp);
             }
@@ -71,13 +72,13 @@ void sortFAT() {
 int checkFATSpace(int size) {
     // check for free space on the EEPROM.
     // first check if we need to check at all
-    if (no_of_files == AMOUNT_OF_FILES) return -1;
+    if ((int)no_of_files == AMOUNT_OF_FILES) return -1;
 
     // calculate end of FAT pointer based on amount of files
     int eof_address = FST_PTR + (AMOUNT_OF_FILES * sizeof(File));
 
     // the amount of space for data is limited
-    if (no_of_files == 0) {
+    if ((int)no_of_files == 0) {
         if (size > ((int)EEPROM.length() - eof_address)) {
             Serial.print(F("Error: cannot save a file with size: "));
             Serial.print(size);
@@ -89,7 +90,7 @@ int checkFATSpace(int size) {
     }
 
     // sort FAT based on begin address
-    if (no_of_files > 1) {
+    if ((int)no_of_files > 1) {
         sortFAT();
     }
 
@@ -99,8 +100,10 @@ int checkFATSpace(int size) {
         return eof_address;
     }
 
+    int eof_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+
     // look for free space between all the files
-    for (unsigned int e = FST_PTR; e < (FST_PTR + (no_of_files * sizeof(File))); e += sizeof(File)) {
+    for (int e = FST_PTR; e < eof_ptr; e += sizeof(File)) {
         File c_file = (File)EEPROM.get(e, c_file);
         File n_file = (File)EEPROM.get((e + sizeof(File)), n_file);
 
@@ -109,10 +112,9 @@ int checkFATSpace(int size) {
         }
     }
     
-    File last_file = EEPROM.get((FST_PTR + ((no_of_files * sizeof(File)) - sizeof(File))), last_file);
+    File last_file = EEPROM.get((eof_ptr - sizeof(File)), last_file);
     // space till end of FAT
     if (((int)EEPROM.length() - (last_file.addr + last_file.size)) > size) {
-        Serial.println(last_file.addr + last_file.size);
         return last_file.addr + last_file.size;
     }
     else {
@@ -195,11 +197,14 @@ void retrieve(CommandArgs argv) {
 
     // print the data
     File file = EEPROM.get(f_addr, file);
-    Serial.print("Data in file \"");
+    Serial.print(F("Data in file \""));
     Serial.print(file_name);
-    Serial.print("\": ");
+    Serial.print(F("\": "));
     for (int i = file.addr; i < (file.addr + file.size); i++) {
-        Serial.print((char)EEPROM.read(i));
+        // 255 means empty in the EEPROM, also empty character in ASCII table
+        if ((int)EEPROM.read(i) != 0xFF) {
+            Serial.print((char)EEPROM.read(i));
+        }
     }
     Serial.println();
 
@@ -220,15 +225,16 @@ void files(CommandArgs argv) {
     // list all files in the filesystem.
     int counter = 0;
     for (uint16_t i = 0; i < EEPROM.length(); i++) {
-        if (counter < 100) {
+        if (counter < 50) {
            Serial.print(EEPROM.read(i));
            counter++; 
         }
-        if (counter == 100) {
+        if (counter == 50) {
             Serial.println();
             counter = 0;
         }
     }
+    Serial.println();
 }
 
 void freespace(CommandArgs argv) {
