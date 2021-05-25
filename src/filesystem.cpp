@@ -10,14 +10,14 @@
 #include "common.h"
 #include "filesystem.h"
 
-EERef no_of_files = getNoOfFiles();  //TODO: value not correct after reboot Arduino
+EERef no_of_files = EEPROM[NOF_PTR];
 
-int getNoOfFiles() {
-    // initiate to zero or get current value.
+void initFileSystem() {
+    // initialize to zero if EEPROM empty.
+    // otherwise use existing value on EEPROM.
     if (EEPROM.read(NOF_PTR) == 0xFF) {
-        return EEPROM[NOF_PTR] = 0;
+        no_of_files = 0;
     }
-    return EEPROM[NOF_PTR];
 }
 
 int findFATEntry(const char *name) {

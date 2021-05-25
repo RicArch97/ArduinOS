@@ -21,12 +21,12 @@ typedef struct {
     int size;
 } File;
 
+void initFileSystem();
 int findFATEntry();
 void writeFATEntry(File file);
 void writeData(int addr, int size, char *data);
 void sortFAT();
 int checkFATSpace();
-int getNoOfFiles();
 
 void store(CommandArgs argv);
 void retrieve(CommandArgs argv);
