@@ -2,7 +2,7 @@
     Source file for the CLI of ArduinOS.
 
     Created by Ricardo Steijn on 12-05-2021.
-    Last update on 19-05-2021.
+    Last update on 24-05-2021.
 */
 
 #include <Arduino.h>
