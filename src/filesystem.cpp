@@ -2,7 +2,7 @@
     Source file for the filesystem of ArduinOS.
 
     Created by Ricardo Steijn on 17-05-2021.
-    Last update on 25-05-2021.
+    Last update on 26-05-2021.
 */
 
 #include <Arduino.h>
@@ -24,9 +24,9 @@ int findFATEntry(const char *name) {
     // find an entry on the EEPROM by name.
     if (no_of_files == 0) return -1;
 
-    int eof_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
     // compare the name of every file struct to the arg
-    for (int e = FST_PTR; e < eof_ptr; e += sizeof(File)) {
+    for (int e = FST_PTR; e < eof_last_file_ptr; e += sizeof(File)) {
         File file = (File)EEPROM.get(e, file);
         if (strcmp(file.name, name) == 0) {
             return e;
@@ -38,6 +38,7 @@ int findFATEntry(const char *name) {
 void writeFATEntry(File file) {
     // write a file to the EEPROM.
     EEPROM.put(FST_PTR + ((int)no_of_files * sizeof(File)), file);
+    // update number of files in EEPROM
     no_of_files++;
 }
 
@@ -53,10 +54,10 @@ void writeData(int addr, int size, char *data) {
 
 void sortFAT() {
     // loop through all structs on the EEPROM
-    int eof_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
     // compare current file with next file
-    for (int c = FST_PTR; c < eof_ptr; c += sizeof(File)) {
-        for (int n = c + sizeof(File); n < eof_ptr; n += sizeof(File)) {
+    for (int c = FST_PTR; c < eof_last_file_ptr; c += sizeof(File)) {
+        for (int n = c + sizeof(File); n < eof_last_file_ptr; n += sizeof(File)) {
             File c_file = (File)EEPROM.get(c, c_file);
             File n_file = (File)EEPROM.get(n, n_file);
 
@@ -72,7 +73,10 @@ void sortFAT() {
 int checkFATSpace(int size) {
     // check for free space on the EEPROM.
     // first check if we need to check at all
-    if ((int)no_of_files == AMOUNT_OF_FILES) return -1;
+    if ((int)no_of_files == AMOUNT_OF_FILES) {
+        Serial.println(F("Error: file limit reached."));
+        return -1;
+    }
 
     // calculate end of FAT pointer based on amount of files
     int eof_address = FST_PTR + (AMOUNT_OF_FILES * sizeof(File));
@@ -96,25 +100,25 @@ int checkFATSpace(int size) {
 
     // check for free space between the first file & end of FAT
     File first_file = (File)EEPROM.get(FST_PTR, first_file);
-    if ((first_file.addr - eof_address) > size) {
+    if ((first_file.addr - eof_address) >= size) {
         return eof_address;
     }
 
-    int eof_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
 
     // look for free space between all the files
-    for (int e = FST_PTR; e < eof_ptr; e += sizeof(File)) {
-        File c_file = (File)EEPROM.get(e, c_file);
-        File n_file = (File)EEPROM.get((e + sizeof(File)), n_file);
+    for (int a = FST_PTR; a < eof_last_file_ptr; a += sizeof(File)) {
+        File c_file = (File)EEPROM.get(a, c_file);
+        File n_file = (File)EEPROM.get((a + sizeof(File)), n_file);
 
-        if ((n_file.addr - (c_file.addr + c_file.size)) > size) {
+        if ((n_file.addr - (c_file.addr + c_file.size)) >= size) {
             return c_file.addr + c_file.size;
         }
     }
     
-    File last_file = EEPROM.get((eof_ptr - sizeof(File)), last_file);
+    File last_file = EEPROM.get((eof_last_file_ptr - sizeof(File)), last_file);
     // space till end of FAT
-    if (((int)EEPROM.length() - (last_file.addr + last_file.size)) > size) {
+    if (((int)EEPROM.length() - (last_file.addr + last_file.size)) >= size) {
         return last_file.addr + last_file.size;
     }
     else {
@@ -169,6 +173,9 @@ void store(CommandArgs argv) {
     char *data = strdup(argv.arg[2]);
     writeData(blk_ptr, size, data);
 
+    Serial.print(F("File \""));
+    Serial.print(file.name);
+    Serial.println(F("\" stored successfully."));
     free(name);
     free(data);
 }
@@ -176,11 +183,11 @@ void store(CommandArgs argv) {
 void retrieve(CommandArgs argv) {
     // retrieve a file from the filesystem and print the data.
     char *file_name;
-    if (argv.arg[0] != NULL) {
+    if (strlen(argv.arg[0]) > 0) {
         file_name = strdup(argv.arg[0]);
     }
     else {
-        Serial.println(F("Error: the \"filename\" argument is required."));
+        Serial.println(F("Error: the filename argument is required."));
         return;
     }
 
@@ -214,32 +221,81 @@ void retrieve(CommandArgs argv) {
 void erase(CommandArgs argv) {
     // erase a file from the filesystem.
     char *file_name;
-    if (argv.arg[0] != NULL) {
+    if (strlen(argv.arg[0]) > 0) {
         file_name = strdup(argv.arg[0]);
     }
+    else {
+        Serial.println(F("Error: the filename argument is required."));
+        return;
+    }
 
+    // check if the file exists
+    int f_addr = findFATEntry(file_name);
+    if (f_addr < 0) {
+        Serial.print(F("Error: no file with name \""));
+        Serial.print(file_name);
+        Serial.println(F("\" exists in the filesystem."));
+
+        free(file_name);
+        return;
+    }
+
+    // remove the file data by writing original EEPROM values
+    File file = (File)EEPROM.get(f_addr, file);
+    for (int b = file.addr; b < (file.addr + file.size); b++) {
+        EEPROM.write(b, 0xFF);
+    }
+
+    int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    int last_file_ptr = FST_PTR + (((int)no_of_files - 1) * sizeof(File));
+    // move existing extries in the FAT
+    for (int a = f_addr; a < last_file_ptr; a += sizeof(File)) {
+        File n_file = (File)EEPROM.get((a + sizeof(File)), n_file);
+        EEPROM.put(a, n_file);
+    }
+
+    // remove the remaining entry by rewriting the original EEPROM values
+    for (int a = last_file_ptr; a < eof_last_file_ptr; a++) {
+        EEPROM.write(a, 0xFF);
+    }
+    // update number of files in EEPROM
+    no_of_files--;
+
+    Serial.print(F("File \""));
+    Serial.print(file.name);
+    Serial.println(F("\" removed successfully."));
     free(file_name);
 }
 
 void files(CommandArgs argv) {
     // list all files in the filesystem.
-    int counter = 0;
-    for (uint16_t i = 0; i < EEPROM.length(); i++) {
-        if (counter < 50) {
-           Serial.print(EEPROM.read(i));
-           counter++; 
-        }
-        if (counter == 50) {
-            Serial.println();
-            counter = 0;
-        }
+    if ((int)no_of_files == 0) {
+        Serial.println(F("No files in the filesystem."));
+        return;
     }
-    Serial.println();
+    int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    // loop through all the files in list the names.
+    for (int e = FST_PTR; e < eof_last_file_ptr; e += sizeof(File)) {
+        File file = (File)EEPROM.get(e, file);
+        Serial.print(file.name);
+        Serial.print(F(", size: "));
+        Serial.println(file.size);
+    }
 }
 
 void freespace(CommandArgs argv) {
     // print the amount of free space left on the EEPROM.
-    for (uint16_t i = 0; i < EEPROM.length(); i++) {
-        EEPROM.write(i, 0xFF);
+    int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
+    int eof_address = FST_PTR + (AMOUNT_OF_FILES * sizeof(File));
+    int occupied_size = 0;
+    // loop through all the files in list the names.
+    Serial.println(F("Available space in the file system:"));
+    for (int e = FST_PTR; e < eof_last_file_ptr; e += sizeof(File)) {
+        File file = (File)EEPROM.get(e, file);
+        occupied_size += file.size;
     }
+    Serial.print(F("files that can be saved: "));
+    Serial.println(AMOUNT_OF_FILES - (int)no_of_files);
+    Serial.print(F("space that files can store data on: "));
+    Serial.println((int)EEPROM.length() - (eof_address + occupied_size));
 }
