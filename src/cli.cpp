@@ -2,7 +2,7 @@
     Source file for the CLI of ArduinOS.
 
     Created by Ricardo Steijn on 12-05-2021.
-    Last update on 24-05-2021.
+    Last update on 26-05-2021.
 */
 
 #include <Arduino.h>
@@ -33,9 +33,9 @@ static const CommandType command[] = {
     {KILL, &kill},
 };
 
-void argumentParser() {
-    // Parse given CLI commands.
-
+// Parse given CLI commands.
+void argumentParser() 
+{
     if (Serial.available() > 0) {
         char c = Serial.read();
 
@@ -125,7 +125,9 @@ void argumentParser() {
     }
 }
 
-void help(CommandArgs argv) {
+// Print a help stub on the commandline.
+void help(CommandArgs argv) 
+{
     Serial.println(F(
         "\n"
         "ArduinOS 0.1, A Unix like operating system for Arduino.\n"

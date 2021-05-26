@@ -2,7 +2,7 @@
     Header for the filesystem of ArduinOS.
 
     Created by Ricardo Steijn on 17-05-2021.
-    Last update on 25-05-2021.
+    Last update on 26-05-2021.
 */
 
 #ifndef FILESYSTEM_H
@@ -22,11 +22,11 @@ typedef struct {
 } File;
 
 void initFileSystem();
-int findFATEntry();
+int findFATEntry(const char *name);
 void writeFATEntry(File file);
 void writeData(int addr, int size, char *data);
 void sortFAT();
-int checkFATSpace();
+int checkFileSystemSpace(int size);
 
 void store(CommandArgs argv);
 void retrieve(CommandArgs argv);
