@@ -31,14 +31,14 @@ Simply execute a command by typing the command name, and arguments separated by 
 For example, to store a file:
 
 ```console
-store foo 9 foobar123
+$ store foo 9 foobar123
 ```
 
 Note that the provided size is your own responsability. Providing a size that is too small, will only store characters up to the provided size.
 A size that is too big, will fit the data just fine, but the space that isn't filled by data will be empty.
 
 ```console
-store bar 20 barfoo456
+$ store bar 20 barfoo456
 ```
 
 Will fill 9 bytes, and the remaining 11 bytes will be empty. Keep in mind that the size is allocated and other file data cannot be written to the empty spaces.
