@@ -2,7 +2,7 @@
     Source file for the CLI of ArduinOS.
 
     Created by Ricardo Steijn on 12-05-2021.
-    Last update on 26-05-2021.
+    Last update on 27-05-2021.
 */
 
 #include <Arduino.h>
@@ -131,6 +131,7 @@ void help(CommandArgs argv)
     Serial.println(F(
         "\n"
         "ArduinOS 0.1, A Unix like operating system for Arduino.\n"
+        "Usage: (command) (arg) ...\n"
         "\n"
         "Commands:\n"
         "store\t\t<file> <size> <data>\tStore a file in the filesystem.\n"
