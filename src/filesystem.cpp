@@ -1,9 +1,26 @@
 /*
-    Source file for the filesystem of ArduinOS.
-
-    Created by Ricardo Steijn on 17-05-2021.
-    Last update on 26-05-2021.
-*/
+ *
+ * ArduinOS - Filesystem source file
+ * src/filesystem.cpp
+ *
+ * Copyright (C) 2021 Ricardo Steijn <0955903@hr.nl>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ */
 
 #include <Arduino.h>
 #include <EEPROM.h>
@@ -26,7 +43,7 @@ void initFileSystem()
  * @param name name of the file.
  * @return begin address pointer of the FAT entry.
  */
-int findFATEntry(const char *name) 
+static int findFATEntry(const char *name) 
 {
     // find an entry on the EEPROM by name.
     // returns: address pointer of the FAT entry.
@@ -44,7 +61,7 @@ int findFATEntry(const char *name)
 }
 
 // write a file to the EEPROM.
-void writeFATEntry(File file) 
+static void writeFATEntry(File file) 
 {
     EEPROM.put(FST_PTR + ((int)no_of_files * sizeof(File)), file);
     // update number of files in EEPROM
@@ -52,7 +69,7 @@ void writeFATEntry(File file)
 }
 
 // write data to the referenced address in the FAT.
-void writeData(int addr, int size, char *data) 
+static void writeData(int addr, int size, char *data) 
 {
     int str_index = 0;
     for (int b = addr; b < (addr + size); b++) {
@@ -63,7 +80,7 @@ void writeData(int addr, int size, char *data)
 }
 
 // Sort the FAT based on the address of the filedata.
-void sortFAT() 
+static void sortFAT() 
 {
     int eof_last_file_ptr = FST_PTR + ((int)no_of_files * sizeof(File));
     // compare current file with next file
@@ -88,7 +105,7 @@ void sortFAT()
  * @return begin pointer on the EEPROM where the file can be written when `size` is a positive integer, 
  *      or the max size that can be used by files in the filesystem when `size` is a negetive integer.
  */
-int checkFileSystemSpace(int size) 
+static int checkFileSystemSpace(int size) 
 {
     int max_free_space = 0;
 
