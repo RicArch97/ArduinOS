@@ -43,7 +43,7 @@ void initFileSystem()
  * @param name name of the file.
  * @return begin address pointer of the FAT entry.
  */
-static int findFATEntry(const char *name) 
+int findFATEntry(const char *name) 
 {
     // find an entry on the EEPROM by name.
     // returns: address pointer of the FAT entry.
@@ -135,9 +135,7 @@ static int checkFileSystemSpace(int size)
     }
 
     // sort FAT based on begin address
-    if ((int)no_of_files > 1) {
-        sortFAT();
-    }
+    if ((int)no_of_files > 1) sortFAT();
 
     // check for free space between the first file & end of FAT
     File first_file = (File)EEPROM.get(FST_PTR, first_file);

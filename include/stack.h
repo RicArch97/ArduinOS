@@ -1,7 +1,7 @@
 /*
  *
- * ArduinOS - Filesystem header file
- * include/filesystem.h
+ * ArduinOS - Stack header file
+ * include/stack.h
  *
  * Copyright (C) 2021 Ricardo Steijn <0955903@hr.nl>
  *
@@ -22,29 +22,14 @@
  *
  */
 
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
+#ifndef STACK_H
+#define STACK_H
 
-#include "common.h"
+#include <Arduino.h>
 
-#define AMOUNT_OF_FILES 10
-#define FILENAME_SIZE   12
-#define NOF_PTR         0
-#define FST_PTR         1
+#define STACKSIZE   32
 
-typedef struct {
-    char name[FILENAME_SIZE];
-    int addr;
-    int size;
-} File;
-
-void initFileSystem();
-int findFATEntry(const char *name);
-
-void store(CommandArgs argv);
-void retrieve(CommandArgs argv);
-void erase(CommandArgs argv);
-void files(CommandArgs argv);
-void freespace(CommandArgs argv);
+void pushByte(uint8_t b);
+uint8_t popByte();
 
 #endif

@@ -1,7 +1,7 @@
 /*
  *
- * ArduinOS - Filesystem header file
- * include/filesystem.h
+ * ArduinOS - Memory header file
+ * include/memory.h
  *
  * Copyright (C) 2021 Ricardo Steijn <0955903@hr.nl>
  *
@@ -22,29 +22,25 @@
  *
  */
 
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
-#include "common.h"
+#include <Arduino.h>
 
-#define AMOUNT_OF_FILES 10
-#define FILENAME_SIZE   12
-#define NOF_PTR         0
-#define FST_PTR         1
+#define MAX_VAR_AMOUNT  25
+#define MEM_SIZE        256
 
 typedef struct {
-    char name[FILENAME_SIZE];
-    int addr;
-    int size;
-} File;
+    char name;
+    uint8_t type;
+    uint8_t size;
+    uint8_t addr;
+    int proc_id;
+} Variable;
 
-void initFileSystem();
-int findFATEntry(const char *name);
-
-void store(CommandArgs argv);
-void retrieve(CommandArgs argv);
-void erase(CommandArgs argv);
-void files(CommandArgs argv);
-void freespace(CommandArgs argv);
+void setVar(char name, int proc_id);
+void getVar(char name, int proc_id);
+void clearVar(char name, int proc_id);
+void clearAllVars(int proc_id);
 
 #endif
