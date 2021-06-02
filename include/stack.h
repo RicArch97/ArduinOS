@@ -32,4 +32,7 @@
 void pushByte(uint8_t b);
 uint8_t popByte();
 
+void pushFloat(float f);
+void pushInt(int i);
+
 #endif

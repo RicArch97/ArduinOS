@@ -43,4 +43,8 @@ void getVar(char name, int proc_id);
 void clearVar(char name, int proc_id);
 void clearAllVars(int proc_id);
 
+// debug functions
+void debugPrintMemoryTable();
+void debugPrintMemory();
+
 #endif

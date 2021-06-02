@@ -24,6 +24,7 @@
 
 #include <Arduino.h>
 #include "stack.h"
+#include "instruction_set.h"
 
 uint8_t stack[STACKSIZE];
 uint8_t sp = 0;
@@ -34,4 +35,22 @@ void pushByte(uint8_t b) {
 
 uint8_t popByte() {
     return stack[--sp];
+}
+
+// Push a float to the stack by converting it to 4 bytes.
+void pushFloat(float f)
+{
+    uint8_t *b = (uint8_t *)&f;
+    for (int i = 0; i < FLOAT; i++) {
+        stack[sp++] = b[i];
+    }
+}
+
+// Push an int to the stack by converting it to 2 bytes.
+void pushInt(int i) 
+{
+    unsigned b;
+    memcpy(&b, &i, sizeof(b));
+    stack[sp++] = b & 0xFF;
+    stack[sp++] = b >> 8;
 }
