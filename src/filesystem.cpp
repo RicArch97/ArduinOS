@@ -367,3 +367,10 @@ void freespace(CommandArgs argv)
     Serial.print(checkFileSystemSpace(-1));
     Serial.println(F(" bytes."));
 }
+
+// Reset all values on EEPROM back to original. Debug use only.
+void resetEEPROM() {
+    for (uint16_t i = 0; i < EEPROM.length(); i++) {
+        EEPROM.write(i, 0xFF);
+    }
+}

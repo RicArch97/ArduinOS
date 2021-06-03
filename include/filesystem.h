@@ -46,4 +46,7 @@ void erase(CommandArgs argv);
 void files(CommandArgs argv);
 void freespace(CommandArgs argv);
 
+// debug functions
+void resetEEPROM();
+
 #endif
