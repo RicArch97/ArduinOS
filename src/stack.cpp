@@ -29,21 +29,9 @@
 uint8_t stack[STACKSIZE];
 uint8_t sp = 0;
 
+// Push a byte (char) to the stack.
 void pushByte(uint8_t b) {
     stack[sp++] = b;
-}
-
-uint8_t popByte() {
-    return stack[--sp];
-}
-
-// Push a float to the stack by converting it to 4 bytes.
-void pushFloat(float f)
-{
-    uint8_t *b = (uint8_t *)&f;
-    for (int i = 0; i < FLOAT; i++) {
-        stack[sp++] = b[i];
-    }
 }
 
 // Push an int to the stack by converting it to 2 bytes.
@@ -51,6 +39,35 @@ void pushInt(int i)
 {
     unsigned b;
     memcpy(&b, &i, sizeof(b));
+    stack[sp++] = (b >> 8) & 0xFF;
     stack[sp++] = b & 0xFF;
-    stack[sp++] = b >> 8;
+    stack[sp++] = INT;
+}
+
+// Push a float to the stack by converting it to 4 bytes.
+void pushFloat(float f)
+{
+    unsigned b;
+    memcpy(&b, &f, sizeof(b));
+    stack[sp++] = (b >> 24) & 0xFF;
+    stack[sp++] = (b >> 16) & 0xFF;
+    stack[sp++] = (b >> 8) & 0xFF;
+    stack[sp++] = b & 0xFF;
+    stack[sp++] = FLOAT;
+}
+
+// Push a string to the stack.
+void pushString(const char *s)
+{
+    for (int i = 0; i < strlen(s); i++) {
+        stack[sp++] = s[i];
+    }
+    stack[sp++] = '\0';
+    stack[sp++] = strlen(s) + 1;
+    stack[sp++] = STRING;
+}
+
+// Pop a byte (char) from the stack.
+uint8_t popByte() {
+    return stack[--sp];
 }

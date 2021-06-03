@@ -30,9 +30,10 @@
 #define STACKSIZE   32
 
 void pushByte(uint8_t b);
-uint8_t popByte();
-
-void pushFloat(float f);
 void pushInt(int i);
+void pushFloat(float f);
+void pushString(const char *s);
+
+uint8_t popByte();
 
 #endif
