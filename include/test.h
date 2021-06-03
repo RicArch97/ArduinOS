@@ -1,7 +1,7 @@
 /*
  *
- * ArduinOS - Main file, which runs a setup and then an infinite loop.
- * src/main.cpp
+ * ArduinOS - Tests for ArduinOS header file
+ * include/test.h
  *
  * Copyright (C) 2021 Ricardo Steijn <0955903@hr.nl>
  *
@@ -22,22 +22,9 @@
  *
  */
 
-#include <Arduino.h>
-#include "cli.h"
-#include "filesystem.h"
-#include "test.h"
+#ifndef TEST_H
+#define TEST_H
 
-void setup() {
-  Serial.begin(9600);
+void testMemory();
 
-  Serial.println(F("Welcome to ArduinOS on tty1."));
-  Serial.println(F("Type \"help\" to see a list of commands."));
-
-  initFileSystem();
-
-  testMemory();
-}
-
-void loop() {
-  argumentParser();
-}
+#endif

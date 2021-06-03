@@ -1,7 +1,7 @@
 /*
  *
- * ArduinOS - Main file, which runs a setup and then an infinite loop.
- * src/main.cpp
+ * ArduinOS - Stack header file
+ * include/stack.h
  *
  * Copyright (C) 2021 Ricardo Steijn <0955903@hr.nl>
  *
@@ -22,22 +22,18 @@
  *
  */
 
+#ifndef STACK_H
+#define STACK_H
+
 #include <Arduino.h>
-#include "cli.h"
-#include "filesystem.h"
-#include "test.h"
 
-void setup() {
-  Serial.begin(9600);
+#define STACKSIZE   32
 
-  Serial.println(F("Welcome to ArduinOS on tty1."));
-  Serial.println(F("Type \"help\" to see a list of commands."));
+void pushByte(uint8_t b);
+void pushInt(int i);
+void pushFloat(float f);
+void pushString(const char *s);
 
-  initFileSystem();
+uint8_t popByte();
 
-  testMemory();
-}
-
-void loop() {
-  argumentParser();
-}
+#endif

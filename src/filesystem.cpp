@@ -29,7 +29,7 @@
 
 EERef no_of_files = EEPROM[NOF_PTR];
 
-// initialize `no_of_files` to zero if EEPROM empty, otherwise use existing value on EEPROM.
+// Initialize `no_of_files` to zero if EEPROM empty, otherwise use existing value on EEPROM.
 void initFileSystem() 
 {
     if (EEPROM.read(NOF_PTR) == 0xFF) {
@@ -43,7 +43,7 @@ void initFileSystem()
  * @param name name of the file.
  * @return begin address pointer of the FAT entry.
  */
-static int findFATEntry(const char *name) 
+int findFATEntry(const char *name) 
 {
     // find an entry on the EEPROM by name.
     // returns: address pointer of the FAT entry.
@@ -60,7 +60,7 @@ static int findFATEntry(const char *name)
     return -1;
 }
 
-// write a file to the EEPROM.
+// Write a file to the EEPROM.
 static void writeFATEntry(File file) 
 {
     EEPROM.put(FST_PTR + ((int)no_of_files * sizeof(File)), file);
@@ -68,7 +68,7 @@ static void writeFATEntry(File file)
     no_of_files++;
 }
 
-// write data to the referenced address in the FAT.
+// Write data to the referenced address in the FAT.
 static void writeData(int addr, int size, char *data) 
 {
     int str_index = 0;
@@ -135,9 +135,8 @@ static int checkFileSystemSpace(int size)
     }
 
     // sort FAT based on begin address
-    if ((int)no_of_files > 1) {
+    if ((int)no_of_files > 1) 
         sortFAT();
-    }
 
     // check for free space between the first file & end of FAT
     File first_file = (File)EEPROM.get(FST_PTR, first_file);

@@ -1,7 +1,7 @@
 /*
  *
- * ArduinOS - Main file, which runs a setup and then an infinite loop.
- * src/main.cpp
+ * ArduinOS - Memory header file
+ * include/memory.h
  *
  * Copyright (C) 2021 Ricardo Steijn <0955903@hr.nl>
  *
@@ -22,22 +22,29 @@
  *
  */
 
+#ifndef MEMORY_H
+#define MEMORY_H
+
 #include <Arduino.h>
-#include "cli.h"
-#include "filesystem.h"
-#include "test.h"
 
-void setup() {
-  Serial.begin(9600);
+#define MAX_VAR_AMOUNT  25
+#define MEM_SIZE        256
 
-  Serial.println(F("Welcome to ArduinOS on tty1."));
-  Serial.println(F("Type \"help\" to see a list of commands."));
+typedef struct {
+    char name;
+    uint8_t type;
+    uint8_t size;
+    uint8_t addr;
+    int proc_id;
+} Variable;
 
-  initFileSystem();
+void setVar(char name, int proc_id);
+void getVar(char name, int proc_id);
+void clearVar(char name, int proc_id);
+void clearAllVars(int proc_id);
 
-  testMemory();
-}
+// debug functions
+void debugPrintMemoryTable();
+void debugPrintMemory();
 
-void loop() {
-  argumentParser();
-}
+#endif
