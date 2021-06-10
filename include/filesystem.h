@@ -27,8 +27,6 @@
 
 #include "common.h"
 
-#define AMOUNT_OF_FILES 10
-#define FILENAME_SIZE   12
 #define NOF_PTR         0
 #define FST_PTR         1
 
@@ -40,6 +38,7 @@ typedef struct {
 
 void initFileSystem();
 int findFATEntry(const char *name);
+File readFATEntry(int addr);
 
 void store(CommandArgs argv);
 void retrieve(CommandArgs argv);

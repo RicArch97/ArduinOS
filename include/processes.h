@@ -25,6 +25,28 @@
 #ifndef PROCESSES_H
 #define PROCESSES_H
 
+#include "common.h"
+#include "stack.h"
+
+typedef enum {
+    running = 'r',
+    paused = 'p',
+    terminated = 0
+} Status;
+
+typedef struct {
+    char name[FILENAME_SIZE];
+    int id;
+    Status status;
+    int pgrm_ctr;
+    uint8_t stack_ptr;
+    int file_ptr;
+    uint8_t stack[STACKSIZE];
+} Process;
+
+int checkRunning(int proc_id);
+void changeProcessStatus(int proc_id, Status status);
+
 void run(CommandArgs argv);
 void list(CommandArgs argv);
 void suspend(CommandArgs argv);
