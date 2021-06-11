@@ -91,12 +91,13 @@ void run(CommandArgs argv)
         free(file_name);
         return;
     }
+    File file = readFATEntry(fat_entry_addr);
 
     // create entry in process table
     Process process;
-    strcpy(process.name, readFATEntry(fat_entry_addr).name);
+    strcpy(process.name, file.name);
     process.id = no_of_processes + 1;  // start id at 1 to allow for fail checks
-    process.pgrm_ctr = fat_entry_addr;
+    process.pgrm_ctr = file.addr;
     process.stack_ptr = 0;
     process.status = running;
     processes[no_of_processes++] = process;
