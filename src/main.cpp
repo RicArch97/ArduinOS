@@ -34,8 +34,6 @@ void setup() {
   Serial.println(F("Type \"help\" to see a list of commands."));
 
   initFileSystem();
-
-  testMemory();
 }
 
 void loop() {

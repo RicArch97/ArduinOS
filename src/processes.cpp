@@ -34,7 +34,7 @@ static Process processes[AMOUNT_OF_FILES];
 // Check if a process exists and if it is running.
 int checkRunning(int proc_id)
 {
-    for (int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+    for (unsigned int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
         if (processes[i].id == proc_id && processes[i].status != terminated) {
             return i;
         }
@@ -45,7 +45,7 @@ int checkRunning(int proc_id)
 // Change the status for a process.
 void changeProcessStatus(int proc_id, Status status)
 {
-    for (int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+    for (unsigned int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
         if (processes[i].id == proc_id) {
             if (processes[i].status == status) {
                 Serial.print(F("Error: cannot change status for process "));
@@ -121,8 +121,8 @@ void list(CommandArgs argv)
     }
 
     int processes_running = 0;
-    for (int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
-        if (processes[i].status == running) {
+    for (unsigned int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+        if (processes[i].status != terminated) {
             Serial.print(processes[i].name);
             Serial.print(F(", id: "));
             Serial.print(processes[i].id);
