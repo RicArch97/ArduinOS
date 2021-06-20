@@ -63,13 +63,24 @@ int findFATEntry(const char *name)
 /**
  * Read a FAT entry from the EEPROM.
  * 
- * @param addr Begin address pointer of the FAT entry on the EEPROM.
+ * @param addr begin address pointer of the FAT entry on the EEPROM.
  * @return File struct representing a FAT entry.
  */
 File readFATEntry(int addr)
 {
     File file = EEPROM.get(addr, file);
     return file;
+}
+
+/**
+ * Read one byte of data from the EEPROM at the program counter.
+ * 
+ * @param pc program counter of a process.
+ * @return one byte (uint8_t) of data at the pc location.
+ */
+uint8_t readPcByte(int pc)
+{
+    return EEPROM.read(pc);
 }
 
 // Write a file to the EEPROM.

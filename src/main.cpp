@@ -25,6 +25,7 @@
 #include <Arduino.h>
 #include "cli.h"
 #include "filesystem.h"
+#include "processes.h"
 
 void setup() {
   Serial.begin(9600);
@@ -36,5 +37,8 @@ void setup() {
 }
 
 void loop() {
+  // non-blocking argument parser
   argumentParser();
+  // execute instruction for all processes
+  runProcesses();
 }

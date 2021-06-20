@@ -27,6 +27,7 @@
 #include "processes.h"
 #include "filesystem.h"
 #include "memory.h"
+#include "instruction_set.h"
 
 static int no_of_processes = 0;
 static Process processes[AMOUNT_OF_FILES];
@@ -85,19 +86,24 @@ void changeProcessStatus(int proc_id, State state)
 }
 
 /**
- * Execute the instuctions (code) of the process.
+ * Execute one instruction of a process.
  * 
- * @param proc_id the id of the process.
+ * @param index index of the process in the process table.
  */
-static void execute(int proc_id)
+static void execute(int index)
 {
-
+    switch(readPcByte(processes[index].pc++)) {
+            
+    }
 }
 
-// Run all processes that are in the 'run' state.
+// Run all processes that are in the 'running' state.
 void runProcesses()
 {
-
+    for (size_t i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+        if (processes[i].state == running)
+            execute(i);
+    }
 }
 
 /**

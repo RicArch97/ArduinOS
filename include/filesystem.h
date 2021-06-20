@@ -39,6 +39,7 @@ typedef struct {
 void initFileSystem();
 int findFATEntry(const char *name);
 File readFATEntry(int addr);
+uint8_t readPcByte(int pc);
 
 void store(CommandArgs argv);
 void retrieve(CommandArgs argv);

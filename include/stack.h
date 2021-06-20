@@ -39,6 +39,6 @@ uint8_t popByte(int id);
 char popChar(int id);
 int popInt(int id);
 float popFloat(int id);
-const char *popString(int id);
+char *popString(int id);
 
 #endif

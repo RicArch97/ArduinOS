@@ -6,7 +6,7 @@ This project is currently **a work in progress.**
 
 ## Deploying ArduinOS
 
-You can open this project in VS Code using the PlatfornIO extention. Simply click `upload & monitor` to run ArduinOS.
+You can open this project in VS Code using the PlatformIO extention. Simply click `upload & monitor` to run ArduinOS.
 
 ## Usage
 

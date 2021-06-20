@@ -165,18 +165,17 @@ float popFloat(int id)
  * @param id process id of the process.
  * @return pointer to the string returned from the stack. (char)0 on failure.
  */
-const char *popString(int id)
+char *popString(int id)
 {
     if (popByte(id) != STRING)
         return "";
 
     int size = popByte(id);
-
-    char *s = (char*)malloc(size);
+    
+    char *s;
     for (int i = 0; i < size; i++) {
         s[i] = popByte(id);
     }
-    free(s);
 
     return s;
 }
