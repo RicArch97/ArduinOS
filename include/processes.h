@@ -32,20 +32,23 @@ typedef enum {
     running = 'r',
     paused = 'p',
     terminated = 0
-} Status;
+} State;
 
 typedef struct {
     char name[FILENAME_SIZE];
     int id;
-    Status status;
-    int pgrm_ctr;
-    uint8_t stack_ptr;
-    int file_ptr;
+    State state;
+    int pc;
+    uint8_t sp;
+    int fp;
     uint8_t stack[STACKSIZE];
 } Process;
 
+void runProcesses();
+
+Process *getProcessById(int proc_id);
 int checkRunning(int proc_id);
-void changeProcessStatus(int proc_id, Status status);
+void changeProcessStatus(int proc_id, State status);
 
 void run(CommandArgs argv);
 void list(CommandArgs argv);

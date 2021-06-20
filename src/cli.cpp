@@ -36,7 +36,9 @@ typedef struct {
 static char buffer[BUFSIZE];
 static int char_count = 0;
 
-static const CommandType command[] = {
+typedef void (*func_ptr)(CommandArgs);
+
+static const CommandType command[] PROGMEM = {
     {HELP, &help},
     {STORE, &store},
     {RETRIEVE, &retrieve},
@@ -62,7 +64,7 @@ void argumentParser()
                 bool error_flag = false;
                 CommandArgs argv = {0};
 
-                for (unsigned int n = 0; n < (sizeof(command) / sizeof(CommandType)); n++) {
+                for (size_t n = 0; n < (sizeof(command) / sizeof(CommandType)); n++) {
                     if (memchr(buffer, SPACE_CHAR, sizeof(buffer)) != NULL) {
                         char *arg;
                         char *tmp_buf = strdup(buffer);
@@ -73,7 +75,7 @@ void argumentParser()
                         while (arg != NULL) {
                             // command
                             if (arg_index < 0) {
-                                if (strcmp(command[n].name, arg) == 0) {
+                                if (strcmp_P(arg, command[n].name) == 0) {
                                     command_found = true;
                                     arg = strtok(NULL, SPACE_STR);
                                     arg_index++;
@@ -99,12 +101,13 @@ void argumentParser()
                         free(tmp_buf);
                     }
                     else {
-                        if (strcmp(command[n].name, buffer) == 0) {
+                        if (strcmp_P(buffer, command[n].name) == 0) {
                             command_found = true;
                         }
                     }
                     if (!error_flag && command_found) {
-                        command[n].func(argv);
+                        func_ptr f_ptr = (func_ptr)pgm_read_word(&(command[n].func));
+                        f_ptr(argv);
                         break;
                     }
                 }

@@ -31,31 +31,73 @@
 static int no_of_processes = 0;
 static Process processes[AMOUNT_OF_FILES];
 
-// Check if a process exists and if it is running.
+/**
+ * Get a Process instance from the process table.
+ * 
+ * @param proc_id the id of the process.
+ * @return pointer to Process instance with this id if it exists, otherwise a NULL pointer.
+ */
+Process *getProcessById(int proc_id)
+{
+    for (size_t i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+        if (processes[i].id == proc_id) {
+            return &processes[i];
+        }
+    }
+    return NULL;
+}
+
+/**
+ * Check if a process exists and if it is running.
+ * 
+ * @param proc_id the id of the process.
+ * @return index of the process, or -1 if it doesn't exist, or is terminated.
+ */
 int checkRunning(int proc_id)
 {
-    for (unsigned int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
-        if (processes[i].id == proc_id && processes[i].status != terminated) {
+    for (size_t i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+        if (processes[i].id == proc_id && processes[i].state != terminated) {
             return i;
         }
     }
     return -1;
 }
 
-// Change the status for a process.
-void changeProcessStatus(int proc_id, Status status)
+/**
+ * Change the status for a process.
+ * 
+ * @param proc_id the id of the process.
+ * @param state the new state that the process should have.
+ */
+void changeProcessStatus(int proc_id, State state)
 {
-    for (unsigned int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+    for (size_t i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
         if (processes[i].id == proc_id) {
-            if (processes[i].status == status) {
+            if (processes[i].state == state) {
                 Serial.print(F("Error: cannot change status for process "));
                 Serial.print(proc_id);
                 Serial.print(F(". Process is already in this status."));
             }
             else
-                processes[i].status = status;
+                processes[i].state = state;
         }
     }
+}
+
+/**
+ * Execute the instuctions (code) of the process.
+ * 
+ * @param proc_id the id of the process.
+ */
+static void execute(int proc_id)
+{
+
+}
+
+// Run all processes that are in the 'run' state.
+void runProcesses()
+{
+
 }
 
 /**
@@ -97,9 +139,9 @@ void run(CommandArgs argv)
     Process process;
     strcpy(process.name, file.name);
     process.id = no_of_processes + 1;  // start id at 1 to allow for fail checks
-    process.pgrm_ctr = file.addr;
-    process.stack_ptr = 0;
-    process.status = running;
+    process.pc = file.addr;
+    process.sp = 0;
+    process.state = running;
     processes[no_of_processes++] = process;
 
     Serial.print(F("Process "));
@@ -122,13 +164,13 @@ void list(CommandArgs argv)
     }
 
     int processes_running = 0;
-    for (unsigned int i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
-        if (processes[i].status != terminated) {
+    for (size_t i = 0; i < (sizeof(processes) / sizeof(Process)); i++) {
+        if (processes[i].state != terminated) {
             Serial.print(processes[i].name);
             Serial.print(F(", id: "));
             Serial.print(processes[i].id);
             Serial.print(F(", status: "));
-            Serial.println((char)processes[i].status);
+            Serial.println((char)processes[i].state);
 
             processes_running++;
         }

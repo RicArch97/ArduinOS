@@ -25,7 +25,6 @@
 #include <Arduino.h>
 #include "cli.h"
 #include "filesystem.h"
-#include "test.h"
 
 void setup() {
   Serial.begin(9600);

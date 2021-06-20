@@ -51,7 +51,7 @@ static void sortMemoryTable()
  * @param size the size of the variable that needs to be allocated.
  * @return address pointer where the memory can be written, or -1 for errors.
  */
-static int checkMemoryTable(uint8_t size)
+static uint8_t checkMemoryTable(uint8_t size)
 {
     // first checks
     if (no_of_vars == 0) {
@@ -60,7 +60,7 @@ static int checkMemoryTable(uint8_t size)
             Serial.print(size);
             Serial.print(F("Max size is: "));
             Serial.println(MEM_SIZE);
-            return -1;
+            return UINT8_MAX;
         }
         else return 0;
     }
@@ -85,7 +85,7 @@ static int checkMemoryTable(uint8_t size)
         return variables[no_of_vars - 1].addr + variables[no_of_vars - 1].size;
 
     Serial.println(F("Error: not enough space left in the RAM."));
-    return -1;
+    return UINT8_MAX;
 }
 
 /**
@@ -110,24 +110,29 @@ void setVar(char name, int proc_id)
         }
     }
 
-    // check the type for a string
-    uint8_t type = popByte();
+    // check for data on the stack
+    uint8_t type = popByte(proc_id);
+    if (type == 0) {
+        Serial.println(F("Error: cannot set variable, no data on the stack."));
+        return;
+    }
+    // check if type is a string
     uint8_t size = type;
     if (type == STRING) {
-        size = popByte();
+        size = popByte(proc_id);
     }
 
     // check for free space
     uint8_t addr = checkMemoryTable(size);
-    if (addr < 0) 
+    if (addr == UINT8_MAX) 
         return;
 
     // create new entry in memory table
     Variable var = {name, type, size, addr, proc_id};
 
     // write bytes to memory
-    for (int a = addr; a < (addr + size); a++) {
-        memory[a] = popByte();
+    for (uint8_t a = addr; a < (addr + size); a++) {
+        memory[a] = popByte(proc_id);
     }
     variables[no_of_vars++] = var;
 
@@ -148,14 +153,14 @@ void getVar(char name, int proc_id)
     for (int e = 0; e < no_of_vars; e++) {
         if (name == variables[e].name && proc_id == variables[e].proc_id) {
             // push var data
-            for (int a = variables[e].addr; a < (variables[e].addr + variables[e].size); a++) {
-                pushByte(a);
+            for (uint8_t a = variables[e].addr; a < (variables[e].addr + variables[e].size); a++) {
+                pushByte(memory[a], proc_id);
             }
             // check if string, if so push size
             if (variables[e].type == STRING)
-                pushByte(variables[e].size);
+                pushByte(variables[e].size, proc_id);
             // push the var type
-            pushByte(variables[e].type);
+            pushByte(variables[e].type, proc_id);
             return;
         }
     }
@@ -218,7 +223,7 @@ void debugPrintMemoryTable()
 // Print the data in the memory. debug use only.
 void debugPrintMemory() 
 {
-    for (unsigned int i = 0; i < (sizeof(memory) / sizeof(uint8_t)); i++) {
+    for (size_t i = 0; i < (sizeof(memory) / sizeof(uint8_t)); i++) {
         Serial.print(memory[i]);
     }
     Serial.println();
