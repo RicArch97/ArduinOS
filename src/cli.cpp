@@ -65,7 +65,7 @@ void argumentParser()
                 CommandArgs argv = {0};
 
                 for (size_t n = 0; n < (sizeof(command) / sizeof(CommandType)); n++) {
-                    if (memchr(buffer, SPACE_CHAR, sizeof(buffer)) != NULL) {
+                    if (strchr(buffer, SPACE_CHAR) != NULL) {
                         char *arg;
                         char *tmp_buf = strdup(buffer);
                         int arg_index = -1;
@@ -120,8 +120,6 @@ void argumentParser()
                 // wipe CLI buffer
                 memset(buffer, 0x00, sizeof(buffer));
                 char_count = 0;
-                // reset arg struct
-                memset(&argv, 0, sizeof(CommandArgs));
             }
         }
         else if (c == BACKSPACE) {

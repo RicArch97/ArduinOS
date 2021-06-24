@@ -391,8 +391,25 @@ void freespace(CommandArgs argv)
 }
 
 // Reset all values on EEPROM back to original. Debug use only.
-void resetEEPROM() {
+void debugResetEEPROM() 
+{
     for (uint16_t i = 0; i < EEPROM.length(); i++) {
         EEPROM.write(i, 0xFF);
     }
+}
+
+// Print all bytes on the EEPROM. Debug use only.
+void debugPrintEEPROM()
+{
+    int counter = 0;
+    for (uint16_t i = 0; i < EEPROM.length(); i++) {
+        if (counter < 30) {
+            Serial.print(EEPROM.read(i));
+        }
+        else {
+            Serial.println();
+            counter = 0;
+        }
+    }
+    Serial.println();
 }

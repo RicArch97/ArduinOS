@@ -30,8 +30,7 @@
 void setup() {
   Serial.begin(9600);
 
-  Serial.println(F("Welcome to ArduinOS on tty1."));
-  Serial.println(F("Type \"help\" to see a list of commands."));
+  Serial.println(F("ArduinOS 0.1 ready."));
 
   initFileSystem();
 }

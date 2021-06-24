@@ -27,19 +27,6 @@
 #include "instruction_set.h"
 #include "processes.h"
 
-
-/**
- * Push a byte to the stack. This function does not focus on a specific type.
- * 
- * @param id process id of the process.
- */
-void pushByte(uint8_t b, int id) 
-{
-    Process *p = getProcessById(id);
-    if (p != NULL)
-        p->stack[p->sp++] = b;
-}
-
 /**
  * Push a char to the stack.
  * 
@@ -97,21 +84,6 @@ void pushString(const char *s, int id)
 }
 
 /**
- * Pop one byte from the stack. This function does not focus on a specific type.
- * 
- * @param id process id of the process.
- * @return next byte from the stack, or 0 when there's nothing on the stack.
- */
-uint8_t popByte(int id) 
-{
-    Process *p = getProcessById(id);
-    if (p == NULL || p->sp == 0)
-        return 0;
-
-    return p->stack[--p->sp];
-}
-
-/**
  * Pop an int from the stack.
  * 
  * @param id process id of the process.
@@ -119,9 +91,6 @@ uint8_t popByte(int id)
  */
 char popChar(int id)
 {
-    if (popByte(id) != CHAR)
-        return '\0';
-
     return (char)popByte(id);
 }
 
@@ -133,9 +102,6 @@ char popChar(int id)
  */
 int popInt(int id) 
 {
-    if (popByte(id) != INT)
-        return -1;
-
     int i;
     uint8_t b[] = {popByte(id), popByte(id)};
     memcpy(&i, &b, sizeof(i));
@@ -150,9 +116,6 @@ int popInt(int id)
  */
 float popFloat(int id) 
 {
-    if (popByte(id) != FLOAT)
-        return (float)-1.0;
-    
     float f;
     uint8_t b[] = {popByte(id), popByte(id), popByte(id), popByte(id)};
     memcpy(&f, &b, sizeof(f));
@@ -160,22 +123,45 @@ float popFloat(int id)
 }
 
 /**
+ * Pop a value from the stack.
+ * 
+ * @param id process id of the process.
+ * @return value struct containing one char, int or float
+ */
+Value popVal(int id)
+{
+    Value v = {0};
+    uint8_t type = popByte(id);
+
+    switch(type) {
+        case CHAR: 
+            v.val.c = popChar(id);
+            break;
+        case INT: 
+            v.val.i = popInt(id);
+            break;
+        case FLOAT: 
+            v.val.f = popFloat(id);
+        case STRING:
+            popString(v.val.s, id);
+    }
+    v.type = type;
+
+    return v;
+}
+
+/**
  * Pop a string from the stack.
  * 
+ * @param s pointer to save the string into. 
  * @param id process id of the process.
  * @return pointer to the string returned from the stack. (char)0 on failure.
  */
-char *popString(int id)
+void popString(char *s, int id)
 {
-    if (popByte(id) != STRING)
-        return "";
-
     int size = popByte(id);
     
-    char *s;
     for (int i = 0; i < size; i++) {
         s[i] = popByte(id);
     }
-
-    return s;
 }

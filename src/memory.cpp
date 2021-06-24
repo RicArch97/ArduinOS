@@ -25,7 +25,7 @@
 #include <Arduino.h>
 #include "instruction_set.h"
 #include "memory.h"
-#include "stack.h"
+#include "processes.h"
 
 static int no_of_vars = 0;
 static Variable variables[MAX_VAR_AMOUNT];

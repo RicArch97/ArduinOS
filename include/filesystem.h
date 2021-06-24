@@ -48,6 +48,7 @@ void files(CommandArgs argv);
 void freespace(CommandArgs argv);
 
 // debug functions
-void resetEEPROM();
+void debugResetEEPROM();
+void debugPrintEEPROM();
 
 #endif

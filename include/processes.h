@@ -45,8 +45,6 @@ typedef struct {
 } Process;
 
 void runProcesses();
-
-Process *getProcessById(int proc_id);
 int checkRunning(int proc_id);
 void changeProcessStatus(int proc_id, State status);
 
@@ -55,5 +53,8 @@ void list(CommandArgs argv);
 void suspend(CommandArgs argv);
 void resume(CommandArgs argv);
 void kill(CommandArgs argv);
+
+void pushByte(uint8_t b, int id);
+uint8_t popByte(int id);
 
 #endif
