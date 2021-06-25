@@ -26,6 +26,7 @@
 #include <EEPROM.h>
 #include "common.h"
 #include "filesystem.h"
+#include "cli.h"
 
 EERef no_of_files = EEPROM[NOF_PTR];
 
@@ -242,14 +243,15 @@ void store(CommandArgs argv)
     }
 
     // create a file in the filesystem
-    File file;
+    File file = {0};
     strcpy(file.name, name);
     file.addr = blk_ptr;
     file.size = size;
     writeFATEntry(file);
 
     // write the file data to the drive
-    char *data = strdup(argv.arg[2]);
+    char *data = (char*)malloc(size);
+    Serial.readBytes(data, size);
     writeData(blk_ptr, size, data);
 
     Serial.print(F("File \""));

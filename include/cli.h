@@ -28,7 +28,7 @@
 #include "common.h"
 
 // Command buffer
-#define BUFSIZE             256
+#define BUFSIZE             25
 #define COMMAND_NAMESIZE    12
 
 // Command names

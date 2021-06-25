@@ -73,13 +73,13 @@ void changeProcessStatus(int proc_id, State state)
 /**
  * Execute one instruction of a process.
  * 
- * @param proc_id id of the process.
+ * @param index index of the process in the process table.
  */
 static void execute(int index)
 {
     uint8_t instruction = readPcByte(processes[index].pc++);
     uint8_t str_len = 0;
-
+    
     switch(instruction) {
         case STOP:
             clearAllVars(processes[index].id);
@@ -94,39 +94,28 @@ static void execute(int index)
             pushByte(instruction, processes[index].id);
             break;
         case STRING:
-            for (uint8_t b = readPcByte(processes[index].pc); b != '\0'; b = readPcByte(++processes[index].pc)) {
+            for (uint8_t b = readPcByte(processes[index].pc); b != '\0'; b = readPcByte(processes[index].pc++)) {
                 pushByte(readPcByte(processes[index].pc), processes[index].id);
                 str_len++;
             }
-            pushByte(str_len, processes[index].id);
+            pushByte('\0', processes[index].id);
+            pushByte(str_len + 1, processes[index].id);
             pushByte(instruction, processes[index].id);
             break;
         case PRINT:
         case PRINTLN:
-            Value v = popVal(processes[index].id);
-            switch(v.type) {
-                case CHAR:
-                    if (instruction == PRINT) 
-                        Serial.print((char)v.val.c);
-                    else Serial.println((char)v.val.c);
-                    break;
-                case INT:
-                    if (instruction == PRINT) 
-                        Serial.print((int)v.val.i);
-                    else Serial.println((int)v.val.i);
-                    break;
-                case FLOAT:
-                    if (instruction == PRINT)
-                        Serial.print((float)v.val.f);
-                    else Serial.println((float)v.val.f);
-                    break;
-                case STRING:
-                    if (instruction == PRINT)
-                        Serial.print(v.val.s);
-                    else Serial.println(v.val.s);
-            }
+            printVal(instruction, processes[index].id);
             break;
-
+        case SET:
+            setVar(readPcByte(processes[index].pc++), processes[index].id);
+            break;
+        case GET:
+            getVar(readPcByte(processes[index].pc++), processes[index].id);
+            break;
+        case INCREMENT:
+        case DECREMENT:
+            unaryOperation(instruction, processes[index].id);
+            break;
     }
 }
 

@@ -25,8 +25,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define ARG_NAMESIZE    64
-#define MAX_ARG_AMOUNT  3
+#define ARG_NAMESIZE    12
+#define MAX_ARG_AMOUNT  2
 
 #define FILENAME_SIZE   12
 #define AMOUNT_OF_FILES 10

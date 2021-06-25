@@ -126,28 +126,17 @@ float popFloat(int id)
  * Pop a value from the stack.
  * 
  * @param id process id of the process.
- * @return value struct containing one char, int or float
+ * @return float value that can be either char, int or float.
  */
-Value popVal(int id)
+float popVal(uint8_t type, int id)
 {
-    Value v = {0};
-    uint8_t type = popByte(id);
-
     switch(type) {
-        case CHAR: 
-            v.val.c = popChar(id);
-            break;
-        case INT: 
-            v.val.i = popInt(id);
-            break;
-        case FLOAT: 
-            v.val.f = popFloat(id);
-        case STRING:
-            popString(v.val.s, id);
+        case CHAR: return popChar(id); break;
+        case INT: return popInt(id); break;
+        case FLOAT: return popFloat(id); break;
     }
-    v.type = type;
 
-    return v;
+    return (float)-1.0;
 }
 
 /**
@@ -163,5 +152,81 @@ void popString(char *s, int id)
     
     for (int i = 0; i < size; i++) {
         s[i] = popByte(id);
+    }
+}
+
+/**
+ * Print a value from the stack.
+ * 
+ * @param t instruction type.
+ * @param id process id of the process.
+ * @return value struct containing one char, int or float
+ */
+void printVal(uint8_t t, int id)
+{
+    uint8_t type = popByte(id);
+    float v = popVal(type, id);
+    char *s;
+
+    switch(type) {
+        case CHAR:
+            if (t == PRINT) Serial.print((char)v);
+            else Serial.println((char)v);
+            break;
+        case INT:
+            if (t == PRINT) Serial.print((int)v);
+            else Serial.println((int)v);
+            break;
+        case FLOAT:
+            if (t == PRINT) Serial.print(v);
+            else Serial.println(v);
+            break;
+        case STRING:
+            popString(s, id);
+            if (t == PRINT) Serial.print(s);
+            else Serial.println(s);
+            break;
+    }
+}
+
+/**
+ * Pop a value from the stack, do a unary operation and push back the value.
+ * 
+ * @param t instruction type.
+ * @param id process id of the process.
+ */
+void unaryOperation(uint8_t t, int id)
+{
+    uint8_t type = popByte(id);
+    float v = popVal(type, id);
+    if (v < 0) return;  // string
+
+    switch(t) {
+        case INCREMENT:
+            switch(type) {
+                case CHAR:
+                    pushChar((char)++v, id);
+                    break;
+                case INT:
+                    pushInt((int)++v, id);
+                    break;
+                case FLOAT:
+                    pushFloat((float)++v, id);
+                    break;
+            }
+            break;
+        case DECREMENT:
+            switch(type) {
+                case CHAR:
+                    pushChar((char)--v, id);
+                    break;
+                case INT:
+                    pushInt((int)--v, id);
+                    break;
+                case FLOAT:
+                    pushFloat((float)--v, id);
+                    break;
+            }
+            break;
     }
 }

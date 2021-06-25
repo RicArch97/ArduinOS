@@ -1,0 +1,12 @@
+0 SET i 
+LOOP 
+    GET i INCREMENT SET i 
+    GET i PRINTLN 
+    GET i 5 EQUALS 
+    IF 14 
+        "test_while" FORK
+        WAITUNTILDONE 
+    ENDIF 
+    MILLIS 1000 PLUS
+    DELAYUNTIL 
+ENDLOOP

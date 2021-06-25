@@ -1,0 +1,8 @@
+20 SET i 
+"test_vars" 0 OPEN 
+GET i 
+WHILE 2 8 
+    READCHAR TOINT PRINTLN 
+    GET i DECREMENT SET i 
+ENDWHILE 
+STOP

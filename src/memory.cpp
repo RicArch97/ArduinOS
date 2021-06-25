@@ -113,7 +113,7 @@ void setVar(char name, int proc_id)
     // check for data on the stack
     uint8_t type = popByte(proc_id);
     if (type == 0) {
-        Serial.println(F("Error: cannot set variable, no data on the stack."));
+        Serial.println(F("Error: cannot set variable, process not found."));
         return;
     }
     // check if type is a string

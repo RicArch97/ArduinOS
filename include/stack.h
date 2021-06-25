@@ -29,18 +29,6 @@
 
 #define STACKSIZE   32
 
-union Types {
-    int i;
-    char c;
-    float f;
-    char *s;
-};
-
-typedef struct {
-    uint8_t type;
-    union Types val;
-} Value;
-
 void pushByte(uint8_t b, int id);
 void pushChar(char c, int id);
 void pushInt(int i, int id);
@@ -51,7 +39,10 @@ uint8_t popByte(int id);
 char popChar(int id);
 int popInt(int id);
 float popFloat(int id);
-Value popVal(int id);
+float popVal(uint8_t type, int id);
 void popString(char*s, int id);
+
+void printVal(uint8_t t, int id);
+void unaryOperation(uint8_t t, int id);
 
 #endif
