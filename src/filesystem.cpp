@@ -97,7 +97,6 @@ static void writeData(int addr, int size, char *data)
 {
     int str_index = 0;
     for (int b = addr; b < (addr + size); b++) {
-        if (str_index >= (int)strlen(data)) break;
         EEPROM.write(b, data[str_index]);
         str_index++;
     }

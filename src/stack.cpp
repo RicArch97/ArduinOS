@@ -46,7 +46,7 @@ void pushChar(char c, int id)
 void pushInt(int i, int id) 
 {
     uint16_t b;
-    memcpy(&b, &i, sizeof(b));
+    memcpy(&b, &i, sizeof(i));
     pushByte(((b >> 8) & 0xFF), id);
     pushByte((b & 0xFF), id);
     pushByte(INT, id);
@@ -60,7 +60,7 @@ void pushInt(int i, int id)
 void pushFloat(float f, int id)
 {
     uint32_t b;
-    memcpy(&b, &f, sizeof(b));
+    memcpy(&b, &f, sizeof(f));
     pushByte(((b >> 24) & 0xFF), id);
     pushByte(((b >> 16) & 0xFF), id);
     pushByte(((b >> 8) & 0xFF), id);
@@ -104,7 +104,7 @@ int popInt(int id)
 {
     int i;
     uint8_t b[] = {popByte(id), popByte(id)};
-    memcpy(&i, &b, sizeof(i));
+    memcpy(&i, &b, sizeof(b));
     return i;
 }
 
@@ -118,7 +118,7 @@ float popFloat(int id)
 {
     float f;
     uint8_t b[] = {popByte(id), popByte(id), popByte(id), popByte(id)};
-    memcpy(&f, &b, sizeof(f));
+    memcpy(&f, &b, sizeof(b));
     return f;
 }
 
@@ -146,12 +146,11 @@ float popVal(uint8_t type, int id)
  * @param id process id of the process.
  * @return pointer to the string returned from the stack. (char)0 on failure.
  */
-void popString(char *s, int id)
-{
-    int size = popByte(id);
-    
-    for (int i = 0; i < size; i++) {
-        s[i] = popByte(id);
+void popString(char *s, int size, int id)
+{    
+    s[size - 1] = popByte(id);  // null char
+    for (int i = size - 2; i >= 0; i--) {
+        s[i] = (char)popByte(id);
     }
 }
 
@@ -182,9 +181,12 @@ void printVal(uint8_t t, int id)
             else Serial.println(v);
             break;
         case STRING:
-            popString(s, id);
+            int size = popByte(id);
+            s = (char*)malloc(size);
+            popString(s, size, id);
             if (t == PRINT) Serial.print(s);
             else Serial.println(s);
+            free(s);
             break;
     }
 }

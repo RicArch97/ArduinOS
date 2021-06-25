@@ -94,7 +94,7 @@ static void execute(int index)
             pushByte(instruction, processes[index].id);
             break;
         case STRING:
-            for (uint8_t b = readPcByte(processes[index].pc); b != '\0'; b = readPcByte(processes[index].pc++)) {
+            for (uint8_t b = readPcByte(processes[index].pc); b != '\0'; b = readPcByte(++processes[index].pc)) {
                 pushByte(readPcByte(processes[index].pc), processes[index].id);
                 str_len++;
             }

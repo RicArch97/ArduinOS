@@ -40,7 +40,7 @@ char popChar(int id);
 int popInt(int id);
 float popFloat(int id);
 float popVal(uint8_t type, int id);
-void popString(char*s, int id);
+void popString(char *s, int size, int id);
 
 void printVal(uint8_t t, int id);
 void unaryOperation(uint8_t t, int id);
